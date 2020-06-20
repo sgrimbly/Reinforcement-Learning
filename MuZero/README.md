@@ -1,3 +1,4 @@
+# MuZero & Connect4
 This repo is a (simplified) Python implementation of DeepMind's MuZero algorithm based on the work of Johan Gras https://github.com/johan-gras/MuZero, which in turn was based on
 the extensive Python pseudocode provided by DeepMind's MuZero team.
 Modifications have been made to apply MuZero to play Connect4, as was done for AlphaZero by Soh Wee Tee https://github.com/plkmo/AlphaZero_Connect4.
