@@ -1,17 +1,18 @@
 import collections
 from typing import Optional, Dict
 
-import tensorflow as tf
+import tensorflow_core as tf
 
-#from game.cartpole import CartPole
-from game.connect4 import Connect4
+from game.cartpole import CartPole
 from game.game import AbstractGame
 from networks.cartpole_network import CartPoleNetwork
 from networks.network import BaseNetwork, UniformNetwork
 
 KnownBounds = collections.namedtuple('KnownBounds', ['min', 'max'])
 
+
 class MuZeroConfig(object):
+
     def __init__(self,
                  game,
                  nb_training_loop: int,
@@ -79,7 +80,7 @@ class MuZeroConfig(object):
         # self.lr_decay_steps = lr_decay_steps
 
     def new_game(self) -> AbstractGame:
-        return self.game(action_space_size=7,discount=self.discount)
+        return self.game(self.discount)
 
     def new_network(self) -> BaseNetwork:
         return self.network(**self.network_args)
@@ -91,66 +92,13 @@ class MuZeroConfig(object):
         return tf.keras.optimizers.SGD(learning_rate=self.lr, momentum=self.momentum)
 
 
-def make_board_game_config(action_space_size: int, max_moves: int,
-                           dirichlet_alpha: float,
-                           lr_init: float) -> MuZeroConfig:
-
-    def visit_softmax_temperature(num_moves, training_steps):
-        if num_moves < 30:
-            return 1.0
-        else:
-            return 0.0  # Play according to the max.
-
-    return MuZeroConfig(
-        game=Connect4,
-        nb_training_loop=50,
-        nb_episodes=20,
-        nb_epochs=20,
-        network_args={'action_size': 7,
-                      'state_size': 2,
-                      'representation_size': 2,
-                      'max_value': 500}, # What is this??
-        network=CartPoleNetwork, # Using this for connect4 for now
-        action_space_size=action_space_size,
-        max_moves=max_moves,
-        discount=0.99,
-        dirichlet_alpha=dirichlet_alpha,
-        num_simulations=11,
-        batch_size=64,
-        td_steps=max_moves,  # Always use Monte Carlo return.
-        #num_actors=1,
-        lr=lr_init,
-        #lr_decay_steps=400e3,
-        visit_softmax_temperature_fn=visit_softmax_temperature,
-        known_bounds=KnownBounds(-1, 1)
-      )
-
-def make_connect4_config() -> MuZeroConfig:
-    return make_board_game_config(action_space_size=7, max_moves=20, dirichlet_alpha=0.03, lr_init=0.01)
-
-class Action(object):
-    def __init__(self, index: int):
-        self.index = index
-
-    def __hash__(self):
-        return self.index
-
-    def __eq__(self, other):
-        return self.index == other
-
-    def __gt__(self, other):
-        return self.index > other
-
-
-
-# CartPole
 def make_cartpole_config() -> MuZeroConfig:
     def visit_softmax_temperature(num_moves, training_steps):
         return 1.0
 
     return MuZeroConfig(
         game=CartPole,
-        nb_training_loop=50,
+        nb_training_loop=15,
         nb_episodes=20,
         nb_epochs=20,
         network_args={'action_size': 2,
@@ -169,9 +117,31 @@ def make_cartpole_config() -> MuZeroConfig:
         lr=0.05)
 
 
-
 """
 Legacy configs from the DeepMind's pseudocode.
+
+def make_board_game_config(action_space_size: int, max_moves: int,
+                           dirichlet_alpha: float,
+                           lr_init: float) -> MuZeroConfig:
+    def visit_softmax_temperature(num_moves, training_steps):
+        if num_moves < 30:
+            return 1.0
+        else:
+            return 0.0  # Play according to the max.
+
+    return MuZeroConfig(
+        action_space_size=action_space_size,
+        max_moves=max_moves,
+        discount=1.0,
+        dirichlet_alpha=dirichlet_alpha,
+        num_simulations=800,
+        batch_size=2048,
+        td_steps=max_moves,  # Always use Monte Carlo return.
+        num_actors=3000,
+        lr_init=lr_init,
+        lr_decay_steps=400e3,
+        visit_softmax_temperature_fn=visit_softmax_temperature,
+        known_bounds=KnownBounds(-1, 1))
 
 
 def make_go_config() -> MuZeroConfig:

@@ -38,7 +38,6 @@ def play_game(config: MuZeroConfig, network: AbstractNetwork, train: bool = True
     """
     game = config.new_game()
     mode_action_select = 'softmax' if train else 'max'
-    
 
     while not game.terminal() and len(game.history) < config.max_moves:
         # At the root of the search tree we use the representation function to
@@ -51,9 +50,6 @@ def play_game(config: MuZeroConfig, network: AbstractNetwork, train: bool = True
 
         # We then run a Monte Carlo Tree Search using only action sequences and the
         # model learned by the networks.
-        
-        # print(type(config.action_space_size))
-        # print(type(game.action_space_size))
         run_mcts(config, root, game.action_history(), network)
         action = select_action(config, len(game.history), root, network, mode=mode_action_select)
         game.apply(action)

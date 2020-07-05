@@ -41,8 +41,7 @@ class ReplayBuffer(object):
             mask_time_batch.append(mask)
             dynamic_mask_time_batch.append(dynamic_mask)
             last_mask = mask
-            actions_time_batch[i] = [action for action in actions_batch if action]
-            #actions_time_batch[i] = [action.index for action in actions_batch if action]
+            actions_time_batch[i] = [action.index for action in actions_batch if action]
 
         batch = image_batch, targets_init_batch, targets_time_batch, actions_time_batch, mask_time_batch, dynamic_mask_time_batch
         return batch

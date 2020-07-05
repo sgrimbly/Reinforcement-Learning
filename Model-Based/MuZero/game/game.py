@@ -14,7 +14,7 @@ class Action(object):
         return self.index
 
     def __eq__(self, other):
-        return self.index == other#.index
+        return self.index == other.index
 
     def __gt__(self, other):
         return self.index > other.index
@@ -25,6 +25,7 @@ class Player(object):
     A one player class.
     This class is useless, it's here for legacy purpose and for potential adaptations for a two players MuZero.
     """
+
     def __eq__(self, other):
         return True
 
